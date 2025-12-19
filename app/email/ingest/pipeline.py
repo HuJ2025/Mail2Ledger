@@ -21,6 +21,9 @@ from app.email.gmail.attachments import download_excel_attachments_in_memory
 from app.email.gmail.labels import resolve_label_ids
 from app.email.gmail.sender import send_email_text
 
+from app.services.aws_postgresql import AWSPostgresGateway
+from app.email.repo.ingest_registry_repo import log_ingest_file_registry
+
 from app.services.ledger_ingest_service import LedgerIngestService
 
 logger = logging.getLogger(__name__)
@@ -281,7 +284,30 @@ def run_once(
 
                 # ✅ Success: mark read first (so we don't reprocess if receipt fails)
                 rows_inserted += int(inserted)
+
                 mark_message_as_read(service, mid)
+
+                # ✅ 写入 ingest_file_registry（每个附件一条）
+                gw = AWSPostgresGateway()
+                try:
+                    for att in attachments:
+                        log_ingest_file_registry(
+                            gw,
+                            client_id=int(meta.get("client_id")),
+                            bank_name=str(meta.get("bank_name")),
+                            account_canonical=None,                 # 你以后做 acct mapping 再填
+                            label_name=label_name,
+                            message_id=mid,
+                            email_from=sender,
+                            email_subject=subject,
+                            email_date_raw=date,
+                            attachment_name=att.get("filename"),
+                            attachment_sha256=att.get("sha256"),
+                            schema_name=schema,
+                            table_name=table,
+                        )
+                finally:
+                    gw.close_connection()
 
                 emails_processed += 1
                 processed_message_ids.add(mid)
