@@ -17,9 +17,9 @@ def main():
     os.chdir(ROOT)
 
     # 基础轮询间隔（秒）
-    base_interval = int(os.getenv("MAIL2LEDGER_POLL_SECONDS", "60"))
+    base_interval = int(os.getenv("MAIL2LEDGER_POLL_SECONDS", "10"))
     # 空转时最大退避（秒）
-    max_interval = int(os.getenv("MAIL2LEDGER_MAX_POLL_SECONDS", "600"))
+    max_interval = int(os.getenv("MAIL2LEDGER_MAX_POLL_SECONDS", "30"))
 
     sleep_s = base_interval
 

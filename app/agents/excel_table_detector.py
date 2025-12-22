@@ -9,7 +9,7 @@ from app.utils.excelchecker import ensure_openpyxl_readable_xlsx_bytes
 from app.services.openai_service import get_agent_response_bg
 from app.utils.helpers import _safe_json_loads
 
-from app.prompts.extract_agent_prompts import EXCEL_HEADER_DATA_RANGE_PROMPT  # 你貼嗰段prompt
+from app.prompts.extract_agent_prompts import EXCEL_HEADER_DATA_RANGE_PROMPT  
 
 def build_workbook_cells_payload(
     xlsx_bytes: bytes,
@@ -40,7 +40,7 @@ def build_workbook_cells_payload(
 def detect_tables_from_bytes(
     content_bytes: bytes,
     password: str | None = None,
-    model: str = "gpt-5.2-mini",
+    model: str = "gpt-5.2",
 ) -> Dict[str, Any]:
     xlsx_bytes = ensure_openpyxl_readable_xlsx_bytes(content_bytes, password=password)
     payload = build_workbook_cells_payload(xlsx_bytes)
